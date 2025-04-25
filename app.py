@@ -20,6 +20,15 @@ def insert_data():
         data = request.get_json()
         if not data:
             return jsonify({"error": "No data provided"}), 400
+
+        # Find the player by name in database
+        player_name = collection.find_one({"name": data["name"]})
+
+        if player_name:
+            # If player exists, update the document
+            collection.update_one({"name": data["name"]}, {"$set": data})
+            return jsonify({"message": "Data updated"}), 200
+
         result = collection.insert_one(data)
         return jsonify({"message": "Data inserted", "id": str(result.inserted_id)}), 200
     except Exception as e:
